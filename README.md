@@ -40,6 +40,7 @@ npm run build
 ```
 yarn build
 ```
+<<<<<<< HEAD
 
 ## Данные и типы данных, используемые в приложении
 
@@ -247,3 +248,5 @@ export interface IBusket {
 
 
 
+=======
+>>>>>>> a2a436b08eebac62438431710ac98377554d95ea
