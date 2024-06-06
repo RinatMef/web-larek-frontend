@@ -89,6 +89,10 @@ export function getElementData<T extends Record<string, unknown>>(el: HTMLElemen
     return data as T;
 }
 
+export function formatNumber(x: number, sep = ' ') {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+}
+
 /**
  * Проверка на простой объект
  */

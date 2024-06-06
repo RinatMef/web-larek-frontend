@@ -1,41 +1,58 @@
-export interface ICard {
-	id: string;
-	description: string;
-	image: string;
-	title: string;
-	category: string;
-	price: number;
+export interface IItem {
+    id: string;
+    description: string;
+    image: string;
+    title: string;
+    category: string;
+    price: number | null;
+    inBasket: boolean;
 }
 
-export type TOrder = Pick<ICard, 'id' | 'price'>;
-export type TBusket = Pick<ICard, 'id' | 'title' | 'price'>;
 
-export interface ICardData {
-	cards: ICard[];
-	preview: string | null;
-	getCard(cardId: string): ICard;
+
+export interface ILarekModel {
+    items: IItem[];
+    getItems(): IItem[];
+    setItems(items: IItem[]): void;
+    getItem(id: string): IItem;
+    addToBasket(id: string): IItem;
+    removeFromBasket(id: string): IItem;
+    getBasketCounter(): number;
+    getBasketItems(): IItem[];
 }
 
-export interface IUser {
-	payMethod: string;
-	adress: string;
+
+export interface IProductResponce {
+    total: number;
+    items: IItem[];
+}
+
+
+
+export interface IOrderForm {
+	payment: string;
+	address: string;
 	email: string;
 	phone: string;
+
 }
 
-export interface IUserData {
-	userData: IUser[];
-	checkValidationUserData(data: Record<keyof IUser, string>): boolean;
+export interface IOrder extends IOrderForm {
+    items: string[]
 }
 
-export interface IBusket {
-	items: TBusket;
-	totalPrice: number;
+export interface IOrderData{
+	order: IOrder;
+	checkOrderValidation(data: Record<keyof IOrder, string>): boolean;
 }
 
-export interface IBusketData {
-	busket: IBusket[];
-	addToBusket(item: TBusket): void;
-	removeFromBusket(itemId: string): void;
-	clearBusket(): void;
+export interface IOrderResponce {
+	id: string;
+    total: number
 }
+
+
+
+
+
+
