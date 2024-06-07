@@ -19,6 +19,7 @@ export interface ILarekModel {
     removeFromBasket(id: string): IItem;
     getBasketCounter(): number;
     getBasketItems(): IItem[];
+    
 }
 
 

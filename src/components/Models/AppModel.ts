@@ -56,4 +56,5 @@ export class LarekModel implements ILarekModel {
         return this.catalog.filter((item) => item.inBasket);
          
     }
+    
 }

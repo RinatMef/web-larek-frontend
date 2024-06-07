@@ -24,7 +24,7 @@ export class Page extends Component<IPage> {
         this.basket = ensureElement<HTMLElement>('.header__basket');
 
         this.basket.addEventListener('click', () => {
-            this.events.emit('basket:openModal');
+            this.events.emit('basket:open');
         });
 
     }

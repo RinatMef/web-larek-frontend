@@ -1,16 +1,18 @@
 import { IItem } from "../../types";
+import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/events";
 
 
 
-export class Item extends Component<IItem> {
+export class ItemBase extends Component<IItem> {
     protected cardImage?: HTMLImageElement;
     protected cardTitle: HTMLElement;
     protected cardDescription: HTMLElement;
     protected cardCategory?: HTMLElement;
     protected cardPrice: HTMLElement;
     protected id: string
+    
 
     constructor (container: HTMLElement, protected events: IEvents) {
         super(container);
@@ -20,8 +22,8 @@ export class Item extends Component<IItem> {
         this.cardCategory = this.container.querySelector('.card__category');
         this.cardPrice = this.container.querySelector('.card__price');
         
-        this.container.addEventListener('click', () => this.events.emit('card:selected', {id: this.id}))
-
+        
+        
     }
 
     set itemId(value: string) {
@@ -47,16 +49,55 @@ export class Item extends Component<IItem> {
 
     set category(value: string) {
         this.setText(this.cardCategory, value)
+        
     }  
 
     set price(value: string) {
         this.setText(this.cardPrice, `${value} синапсов`)
-    }  
+    }
+    
+    
+}
+
+export class Item extends ItemBase {
+    
+
+    constructor (container: HTMLElement, protected events: IEvents) {
+        super(container, events);
+                
+        this.container.addEventListener('click', () => this.events.emit('card:selected', {id: this.id}))
+        
+    }
+
+    set category(value: string) {
+        this.setText(this.cardCategory, value)
+        switch (value) {
+            case 'софт-скил':
+              this.cardCategory.classList.add('card__category_soft')
+              break
+            case 'другое':
+                this.cardCategory.classList.add('card__category_other')
+              break
+            case 'дополнительное':
+                this.cardCategory.classList.add('card__category_additional')
+              break
+            case 'кнопка':
+                this.cardCategory.classList.add('card__category_button')
+              break
+            case 'хард-скил':
+                this.cardCategory.classList.add('card__category_hard')
+              break
+            default:
+                this.cardCategory.classList.remove('card__category_soft')
+              break
+          }
+    }
+    
 }
 
 
 
-export class ItemPreview extends Item {
+export class ItemPreview extends ItemBase {
     protected button: HTMLButtonElement;
     private _inBasket: boolean;
 
@@ -66,18 +107,13 @@ export class ItemPreview extends Item {
 
         this.button.addEventListener('click', () => {
             if (this._inBasket) {
-                this.events.emit('basket:deleteItem', { id: this.id });
+                this.events.emit('preview:deleteItem', { id: this.id });
             } else {
-                this.events.emit('basket:addItem', { id: this.id });
+                this.events.emit('preview:addItem', { id: this.id });
             }
         });
 
-        events.on('basket:statusChanged', (evt) => {
-            const { id, status } = evt as { id: string, status: boolean };
-            if (this.id === id) {
-                this.inBasket = status;
-            }
-        });
+       
     }
 
     set inBasket(value: boolean) {
@@ -92,10 +128,32 @@ export class ItemPreview extends Item {
     get inBasket(): boolean {
         return this._inBasket;
     }
+
+    set category(value: string) {
+        this.setText(this.cardCategory, value)
+        switch (value) {
+            case 'софт-скил':
+              this.cardCategory.classList.add('card__category_soft')
+              break
+            case 'другое':
+                this.cardCategory.classList.add('card__category_other')
+              break
+            case 'дополнительное':
+                this.cardCategory.classList.add('card__category_additional')
+              break
+            case 'кнопка':
+                this.cardCategory.classList.add('card__category_button')
+              break
+            case 'хард-скил':
+                this.cardCategory.classList.add('card__category_hard')
+              break
+            default:
+                this.cardCategory.classList.remove('card__category_soft')
+              break
+          }
+    }
 }
 
-    
-
-    
 
 
+  

@@ -4,8 +4,8 @@ import { EventEmitter } from './components/base/events';
 import { LarekAPI } from './components/common/AppAPI';
 import { Modal } from './components/common/Modal';
 import { LarekModel } from './components/Models/AppModel';
-import { Basket } from './components/View/Basket';
-import { Item, ItemPreview } from './components/View/Item';
+import { Basket, BasketItems } from './components/View/Basket';
+import {  Item, ItemPreview } from './components/View/Item';
 import { Page } from './components/View/Page';
 
 
@@ -38,28 +38,37 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events)
 const page = new Page(document.body, events);
 const basket = new Basket(cloneTemplate(basketTemplate), events)
 
+
+
 events.on('catalog:changed', () => {
     const itemsCatalog = model.getItems().map(item => {
         const card = new Item(cloneTemplate(cardCatalogTemplate), events);
         return card.render(item);
     });
-
-    // Обновление каталога
     page.catalog = itemsCatalog;
-
-    // Обновление счетчика корзины
     page.counter = model.getBasketCounter();
 });
 
 events.on('basket:changed', () => {
     page.counter = model.getBasketCounter();
+    
 });
 
+events.on('preview:addItem', (evt) => {
+    const { id } = evt as { id: string };
+    const item = model.addToBasket(id);
+    events.emit('card:selected', evt);
+});
+
+events.on('preview:deleteItem', (evt) => {
+    const { id } = evt as { id: string };
+    const item = model.removeFromBasket(id);
+    events.emit('card:selected', evt);
+});
 
 events.on('card:selected', (evt) => {
     const { id } = evt as { id: string };
     const item = model.getItem(id);
-    
    
         const cardPreview = new ItemPreview(cloneTemplate(cardPreviewTemplate), events);
         cardPreview.render(item);
@@ -77,31 +86,24 @@ events.on('card:selected', (evt) => {
 });
 
 
-events.on('basket:addItem', (evt) => {
-    const { id } = evt as { id: string };
-    const item = model.addToBasket(id);
-    if (item) {
-        events.emit('basket:statusChanged', { id: item.id, status: item.inBasket });
-    }
-});
+
+
 
 events.on('basket:deleteItem', (evt) => {
     const { id } = evt as { id: string };
     const item = model.removeFromBasket(id);
-    if (item) {
-        events.emit('basket:statusChanged', { id: item.id, status: item.inBasket });
-    }
+    events.emit('basket:open', evt);
 });
 
 
 
-events.on('basket:openModal', () => {
-    const basketItems = model.getBasketItems().map(item => {
-        const card = new Item(cloneTemplate(cardTemplateBasket), events)
-        return card.render(item)
 
+events.on('basket:open', () => {
+    const basketItems = model.getBasketItems().map((item, index) => {
+        const basketList = new BasketItems(cloneTemplate(cardTemplateBasket), events)
+        basketList.index = index +1;
+        return basketList.render(item)
     })
-    
     modal.render({
         content: basket.render({    
             items: basketItems,
@@ -110,37 +112,15 @@ events.on('basket:openModal', () => {
     });
 });
 
-console.log(`Это все что в корзине ${model.getBasketItems()}`);
 
 
 
-
-
-
-
-const cont = model.getBasketCounter()
-    console.log(`В корзине ${cont}`)
-    setTimeout(() => {
-        
-        model.addToBasket('f3867296-45c7-4603-bd34-29cea3a061d5');  // Закрывающая скобка была добавлена
-        const newCont = model.getBasketCounter();  // Переименована переменная для избежания конфликта имен
-        console.log(`В корзине ${newCont}`);
-        console.log(`Это все что в корзине ${model.getBasketItems()}`);  // Вызов метода исправлен на model.getBasketItems()
-    }, 3000);
-
-    
-
-
-
-
-
-
-    events.on('modal:open', () => {
+events.on('modal:open', () => {
         page.locked = true;
     });
     
     // ... и разблокируем
-    events.on('modal:close', () => {
+events.on('modal:close', () => {
         page.locked = false;
     });
     
