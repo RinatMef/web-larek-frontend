@@ -52,8 +52,15 @@ export class ItemBase extends Component<IItem> {
         
     }  
 
-    set price(value: string) {
-        this.setText(this.cardPrice, `${value} синапсов`)
+    set price(value: number | null) {
+        const formatPrice = (value: number | null): string => {
+            if (value === null) {
+                return 'Бесценно';
+            }
+            return `${value} синапсов`;
+        }
+        
+        this.setText(this.cardPrice, formatPrice(value));
     }
     
     
@@ -61,7 +68,6 @@ export class ItemBase extends Component<IItem> {
 
 export class Item extends ItemBase {
     
-
     constructor (container: HTMLElement, protected events: IEvents) {
         super(container, events);
                 
@@ -121,7 +127,7 @@ export class ItemPreview extends ItemBase {
         if (value) {
             this.setText(this.button, 'Убрать');
         } else {
-            this.setText(this.button, 'В корзинку');
+            this.setText(this.button, 'В корзину');
         }
     }
 

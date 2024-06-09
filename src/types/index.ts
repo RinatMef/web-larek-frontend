@@ -12,6 +12,7 @@ export interface IItem {
 
 export interface ILarekModel {
     items: IItem[];
+    orderData: IOrder | null;
     getItems(): IItem[];
     setItems(items: IItem[]): void;
     getItem(id: string): IItem;
@@ -22,6 +23,7 @@ export interface ILarekModel {
     
 }
 
+export type FormErrors = Partial<Record<keyof IOrder, string>>;
 
 export interface IProductResponce {
     total: number;
@@ -39,7 +41,8 @@ export interface IOrderForm {
 }
 
 export interface IOrder extends IOrderForm {
-    items: string[]
+    items: string[];
+    total: number;
 }
 
 export interface IOrderData{
