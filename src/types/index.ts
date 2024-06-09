@@ -52,7 +52,7 @@ export interface IOrderData{
 
 export interface IOrderResponce {
 	id: string;
-    total: number
+    total: number;
 }
 
 

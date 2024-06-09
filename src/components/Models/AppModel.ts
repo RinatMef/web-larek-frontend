@@ -63,6 +63,11 @@ export class LarekModel implements ILarekModel {
         return item;
     }
 
+    clearBasket() {
+        this.order.items = [];
+        
+    }
+
    
 
     getBasketCounter(): number {
@@ -107,7 +112,7 @@ export class LarekModel implements ILarekModel {
         
         if (this.validateOrder()) {
             this.events.emit('order:ready', this.order);
-            console.log('order:ready');
+            
             
         }
     }

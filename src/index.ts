@@ -8,6 +8,7 @@ import { Basket, BasketItems } from './components/View/Basket';
 import {  Item, ItemPreview } from './components/View/Item';
 import { Contacts, Order } from './components/View/Order';
 import { Page } from './components/View/Page';
+import { Success } from './components/View/Succes';
 
 
 import './scss/styles.scss';
@@ -60,12 +61,14 @@ events.on('basket:changed', () => {
 events.on('preview:addItem', (evt) => {
     const { id } = evt as { id: string };
     model.addToBasket(id);
+    page.counter = model.getBasketCounter();
     events.emit('card:selected', evt);
 });
 
 events.on('preview:deleteItem', (evt) => {
     const { id } = evt as { id: string };
     model.removeFromBasket(id);
+    page.counter = model.getBasketCounter();
     events.emit('card:selected', evt);
 });
 
@@ -189,6 +192,26 @@ events.on('orderErrors:change', (errors: Partial<IOrderForm>) => {
 
 
 
+events.on('order:send', () => {
+    larekApi.orderProducts(model.orderData)
+        .then((result) => {
+            const success = new Success(cloneTemplate(successTemplate), events);
+            
+            model.clearBasket();
+            modal.render({
+                content: success.render({
+                    total: result.total
+                })
+            });
+        })
+        .catch(err => {
+            console.error(err);
+        });
+       
+})
+
+
+
 
 
 
@@ -198,8 +221,6 @@ events.on('orderErrors:change', (errors: Partial<IOrderForm>) => {
     larekApi.getProductList()
     .then((response) => {
         const { items } = response;
-        console.log(items);
-        
         model.setItems(items);
     })
     .catch((err) => {

@@ -12,7 +12,7 @@ export class Order extends Form<IOrderForm> {
     protected _errors: HTMLElement;
     protected orderButtons: HTMLButtonElement[];
 
-    constructor(container: HTMLFormElement, events: IEvents,) {
+    constructor(container: HTMLFormElement, events: IEvents) {
         super(container, events);
 
         this.orderButtons = ensureAllElements<HTMLButtonElement>('.order__buttons button', container);
@@ -26,8 +26,8 @@ export class Order extends Form<IOrderForm> {
             });
         });
 
-        this.submitButton.addEventListener('click', (e) => {
-            console.log(e);
+        this.submitButton.addEventListener('click', () => {
+            
             this.events.emit('contacts:open')
         });
     }
@@ -64,10 +64,8 @@ export class Contacts extends Form<IOrderForm> {
 
         
         this.submitButton.addEventListener('click', () => {
-            console.log('DFSFSAF');
+            this.events.emit('order:send')
             
-            
-            this.events.emit('contacts:ready')
         })
     }
 }

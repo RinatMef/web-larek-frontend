@@ -52,7 +52,7 @@ export class Basket extends Component<IBasket> {
 
     set total(total: number) {
         this.setText(this._total, `${formatNumber(total)} синапсов`);
-        if (total === 0) { // Changed from this.total to total
+        if (total === 0) {
             this.setDisabled(this._button, true);
         } else {
             this.setDisabled(this._button, false);
