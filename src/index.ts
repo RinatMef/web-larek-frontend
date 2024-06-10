@@ -146,6 +146,7 @@ events.on('order:changed', (evt: { payment: string }) => {
 });
 
 events.on('contacts:open', () => {
+    model.checkCost()
     return modal.render({
         content: contacts.render({
             email: model.orderData.email,
@@ -196,11 +197,12 @@ events.on('order:send', () => {
     larekApi.orderProducts(model.orderData)
         .then((result) => {
             const success = new Success(cloneTemplate(successTemplate), events);
-            
-            model.clearBasket();
+            success.responceTotal = result.total;
+            model.removeFromBasket(
+                model.getBasketItems()
+            )
             modal.render({
                 content: success.render({
-                    total: result.total
                 })
             });
         })

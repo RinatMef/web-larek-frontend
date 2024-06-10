@@ -59,17 +59,22 @@ export class LarekModel implements ILarekModel {
         if (item) {
             item.inBasket = false;
             this.order.items = this.order.items.filter(itemId => itemId !== id);
+            
         }
         return item;
     }
 
-    clearBasket() {
-        this.order.items = [];
+    checkCost() {
+        this.order.items = this.order.items.filter(itemId => {
+            const item = this.getItem(itemId);
+            return item && item.price > 0;
+            
+        });
+        console.log('Товары с нулевой стоимостью удалены');
+        
         
     }
-
-   
-
+    
     getBasketCounter(): number {
         return this.catalog.filter((item) => item.inBasket).length;
         
