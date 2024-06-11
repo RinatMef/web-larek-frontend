@@ -20,7 +20,10 @@ export interface ILarekModel {
     removeFromBasket(id: string): IItem;
     getBasketCounter(): number;
     getBasketItems(): IItem[];
-    
+    checkCost(): void;
+    getTotal(): number;
+    validateOrder(): boolean;
+    setOrderField(field: keyof IOrder, value: string): void;
 }
 
 export type FormErrors = Partial<Record<keyof IOrder, string>>;
