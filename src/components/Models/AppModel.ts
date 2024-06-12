@@ -26,6 +26,10 @@ export class LarekModel implements ILarekModel {
 		return this.order;
 	}
 
+	set orderData(data: IOrder) {
+		this.order = data;
+	}
+
 	get items(): IItem[] {
 		return this.catalog;
 	}
@@ -108,7 +112,7 @@ export class LarekModel implements ILarekModel {
 
 	setOrderField(field: keyof IOrderForm, value: string) {
 		this.order[field] = value;
-		console.log(this.order);
+		
 
 		if (this.validateOrder()) {
 			this.events.emit('order:ready', this.order);

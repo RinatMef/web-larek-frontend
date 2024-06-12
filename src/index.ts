@@ -12,7 +12,7 @@ import './scss/styles.scss';
 import { IOrderForm } from './types';
 
 import { API_URL, CDN_URL } from './utils/constants';
-import { cloneTemplate, createElement, ensureElement } from './utils/utils';
+import { cloneTemplate, ensureElement } from './utils/utils';
 
 // Шаблоны
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
@@ -187,7 +187,15 @@ events.on('order:send', () => {
 				content: success.render({}),
 			});
 			events.on('succes:close', () => {
-				modal.close();
+
+			model.setOrderField('address', '');
+			model.setOrderField('email', '');
+			model.setOrderField('phone', '');
+			model.setOrderField('payment', '');
+			order.resetForm();
+			contacts.resetForm();
+			modal.close();
+				
 			});
 		})
 		.catch((err) => {

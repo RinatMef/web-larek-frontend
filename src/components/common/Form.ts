@@ -44,6 +44,8 @@ export class Form<T> extends Component<IFormState> {
     set errors(value: string) {
         this.setText(this._errors, value);
     }
+    
+    
 
     render(state: Partial<T> & IFormState) {
         const {valid, errors, ...inputs} = state;

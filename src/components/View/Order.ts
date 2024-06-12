@@ -48,6 +48,14 @@ export class Order extends Form<IOrderForm> {
 			}
 		});
 	}
+
+	resetForm() {
+		this._address.value = '';
+		this.orderButtons.forEach((button) => {
+			button.classList.remove('button_alt_active');
+			button.classList.add('button_alt');
+		});
+	}
 }
 
 export class Contacts extends Form<IOrderForm> {
@@ -76,5 +84,9 @@ export class Contacts extends Form<IOrderForm> {
 		this.submitButton.addEventListener('click', () => {
 			this.events.emit('order:send');
 		});
+	}
+	resetForm() {
+		this._phone.value = '';
+		this._email.value = '';
 	}
 }
