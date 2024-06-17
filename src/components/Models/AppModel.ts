@@ -7,26 +7,23 @@ import {
 } from '../../types';
 import { IEvents } from '../base/events';
 
-
 export class LarekModel implements ILarekModel {
 	protected catalog: IItem[] = [];
-	protected order: IOrder = {
+	protected order: Omit<IOrder, 'total' | 'items'> = {
 		email: '',
 		phone: '',
 		payment: '',
 		address: '',
-		total: 0,
-		items: [],
 	};
 	formErrors: FormErrors = {};
 
 	constructor(protected events: IEvents) {}
 
-	get orderData(): IOrder {
+	get orderData(): Omit<IOrder, 'total' | 'items'> {
 		return this.order;
 	}
 
-	set orderData(data: IOrder) {
+	set orderData(data: Omit<IOrder, 'total' | 'items'>) {
 		this.order = data;
 	}
 
@@ -34,12 +31,14 @@ export class LarekModel implements ILarekModel {
 		return this.catalog;
 	}
 
-	get orderTotal(): number {
-		return this.order.total;
-	}
+	createFullOrder(): IOrder {
+		const items = this.checkCost();
 
-	getItems(): IItem[] {
-		return this.catalog;
+		return {
+			...this.order,
+			items: items.map((item) => item.id),
+			total: this.getTotal(),
+		};
 	}
 
 	setItems(data: IItem[]): void {
@@ -51,30 +50,22 @@ export class LarekModel implements ILarekModel {
 		return this.catalog.find((item) => item.id === id) as IItem;
 	}
 
-	addToBasket(id: string): IItem {
+	basketChange(id: string): IItem {
 		const item = this.getItem(id);
-		if (item) {
-			item.inBasket = true;
-			this.order.items.push(id);
+		if ((item.inBasket = !item.inBasket)) {
 			this.events.emit('basket:changed');
+			return item;
 		}
-		return item;
+		{
+			this.getBasketItems().filter((item) => item.id !== id);
+			return item;
+		}
 	}
 
-	removeFromBasket(id: string): IItem {
-		const item = this.getItem(id);
-		if (item) {
-			item.inBasket = false;
-			this.order.items = this.order.items.filter((itemId) => itemId !== id);
-		}
-		return item;
-	}
-
-	checkCost() {
-		this.order.items = this.order.items.filter((itemId) => {
-			const item = this.getItem(itemId);
-			return item && item.price > 0;
-		});
+	checkCost(): IItem[] {
+		return this.getBasketItems().filter(
+			(item) => item.price !== null && item.price > 0
+		);
 	}
 
 	getBasketCounter(): number {
@@ -112,7 +103,6 @@ export class LarekModel implements ILarekModel {
 
 	setOrderField(field: keyof IOrderForm, value: string) {
 		this.order[field] = value;
-		
 
 		if (this.validateOrder()) {
 			this.events.emit('order:ready', this.order);

@@ -7,10 +7,8 @@ import { Item, ItemPreview } from './components/View/Item';
 import { Contacts, Order } from './components/View/Order';
 import { Page } from './components/View/Page';
 import { Success } from './components/View/Succes';
-
 import './scss/styles.scss';
 import { IOrderForm } from './types';
-
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
 
@@ -27,14 +25,14 @@ const larekApi = new LarekAPI(CDN_URL, API_URL);
 const events = new EventEmitter();
 const model = new LarekModel(events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
-
+const success = new Success(cloneTemplate(successTemplate), events);
 const page = new Page(document.body, events);
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 const order = new Order(cloneTemplate(orderTemplate), events);
 const contacts = new Contacts(cloneTemplate(contactTemplate), events);
 
 events.on('catalog:changed', () => {
-	const itemsCatalog = model.getItems().map((item) => {
+	const itemsCatalog = model.items.map((item) => {
 		const card = new Item(cloneTemplate(cardCatalogTemplate), events);
 		return card.render(item);
 	});
@@ -48,14 +46,14 @@ events.on('basket:changed', () => {
 
 events.on('preview:addItem', (evt) => {
 	const { id } = evt as { id: string };
-	model.addToBasket(id);
+	model.basketChange(id);
 	page.counter = model.getBasketCounter();
 	events.emit('card:selected', evt);
 });
 
 events.on('preview:deleteItem', (evt) => {
 	const { id } = evt as { id: string };
-	model.removeFromBasket(id);
+	model.basketChange(id);
 	page.counter = model.getBasketCounter();
 	events.emit('card:selected', evt);
 });
@@ -83,7 +81,7 @@ events.on('card:selected', (evt) => {
 
 events.on('basket:deleteItem', (evt) => {
 	const { id } = evt as { id: string };
-	model.removeFromBasket(id);
+	model.basketChange(id);
 	page.counter = model.getBasketCounter();
 	events.emit('basket:open', evt);
 });
@@ -116,16 +114,7 @@ events.on('order:open', () => {
 	});
 });
 
-events.on('order:changed', (evt: { payment: string }) => {
-	model.setOrderField('payment', evt.payment);
-	model.orderData.total = model.getTotal();
-	order.orderButtonsStyle = model.orderData.payment;
-
-	events.emit('order:open');
-});
-
 events.on('contacts:open', () => {
-	model.checkCost();
 	return modal.render({
 		content: contacts.render({
 			email: model.orderData.email,
@@ -151,6 +140,7 @@ events.on(
 	(data: { field: keyof IOrderForm; value: string }) => {
 		model.setOrderField(data.field, data.value);
 		console.log('^order..*:change/');
+		order.orderButtonsStyle = model.orderData.payment;
 	}
 );
 
@@ -176,26 +166,23 @@ events.on('orderErrors:change', (errors: Partial<IOrderForm>) => {
 
 events.on('order:send', () => {
 	larekApi
-		.orderProducts(model.orderData)
+		.orderProducts(model.createFullOrder())
 		.then((result) => {
-			const success = new Success(cloneTemplate(successTemplate), events);
 			success.responceTotal = result.total;
 			const basketItems = model.getBasketItems().map((item) => item.id);
-			basketItems.forEach((item) => model.removeFromBasket(item));
+			basketItems.forEach((item) => model.basketChange(item));
 			page.counter = model.getBasketCounter();
-			modal.render({
-				content: success.render({}),
-			});
-			events.on('succes:close', () => {
-
 			model.setOrderField('address', '');
 			model.setOrderField('email', '');
 			model.setOrderField('phone', '');
 			model.setOrderField('payment', '');
 			order.resetForm();
 			contacts.resetForm();
-			modal.close();
-				
+			modal.render({
+				content: success.render({}),
+			});
+			events.on('succes:close', () => {
+				modal.close();
 			});
 		})
 		.catch((err) => {

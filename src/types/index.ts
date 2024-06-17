@@ -12,21 +12,19 @@ export interface IItem {
 
 export interface ILarekModel {
     items: IItem[];
-    orderData: IOrder | null;
-    getItems(): IItem[];
+    createFullOrder(): IOrder;
     setItems(items: IItem[]): void;
     getItem(id: string): IItem;
-    addToBasket(id: string): IItem;
-    removeFromBasket(id: string): IItem;
+    basketChange(id: string): IItem;
     getBasketCounter(): number;
     getBasketItems(): IItem[];
     checkCost(): void;
     getTotal(): number;
     validateOrder(): boolean;
-    setOrderField(field: keyof IOrder, value: string): void;
+    setOrderField(field: keyof IOrderForm, value: string): void;
 }
 
-export type FormErrors = Partial<Record<keyof IOrder, string>>;
+export type FormErrors = Partial<Record<keyof IOrderForm, string>>;
 
 export interface IProductResponce {
     total: number;
@@ -46,11 +44,6 @@ export interface IOrderForm {
 export interface IOrder extends IOrderForm {
     items: string[];
     total: number;
-}
-
-export interface IOrderData{
-	order: IOrder;
-	checkOrderValidation(data: Record<keyof IOrder, string>): boolean;
 }
 
 export interface IOrderResponce {

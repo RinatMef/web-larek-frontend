@@ -61,14 +61,16 @@ export interface IItem {
 ```
 export interface ILarekModel {
 	items: IItem[];
-	orderData: IOrder | null;
-	getItems(): IItem[];
-	setItems(items: IItem[]): void;
-	getItem(id: string): IItem;
-	addToBasket(id: string): IItem;
-	removeFromBasket(id: string): IItem;
-	getBasketCounter(): number;
-	getBasketItems(): IItem[];
+    createFullOrder(): IOrder;
+    setItems(items: IItem[]): void;
+    getItem(id: string): IItem;
+    basketChange(id: string): IItem;
+    getBasketCounter(): number;
+    getBasketItems(): IItem[];
+    checkCost(): void;
+    getTotal(): number;
+    validateOrder(): boolean;
+    setOrderField(field: keyof IOrderForm, value: string): void;
 }
 ```
 Интерфейс ошибки формы
@@ -181,6 +183,10 @@ addToBasket(id: string): IItem - добавляет карточку по иде
 	setOrderField(field: keyof IOrderForm, value: string) - добавляет данные из инпута в order.
 
 ```
+```
+	createFullOrder(): IOrder; - добавляет данные из catalog в order (total & items).
+
+```
 
 
 - events: IEvents - экземпляр класса `EventEmitter` для инициации событий при изменении данных.
@@ -255,6 +261,9 @@ render метод обновляет состояние формы.
 ```
 метод resetForm() - сбрасывает поля формы;
 ```
+
+```
+метод onPaymentChange() - отправляет событие при изменении значения кнопок выбора способа оплаты.
 
 #### класс Contacts
 

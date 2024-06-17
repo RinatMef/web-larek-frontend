@@ -59,19 +59,16 @@ export class Basket extends Component<IBasket> {
 
 export class BasketItems extends ItemBase {
 	protected _index: HTMLElement;
-	protected cardTitle: HTMLElement;
-	protected cardPrice: HTMLElement;
+	
 	protected _deleteButton: HTMLButtonElement;
 	
 
 	constructor(container: HTMLElement, protected events: IEvents) {
 		super(container, events);
 
-		this.cardTitle = ensureElement<HTMLElement>('.card__title', this.container);
+		
 		this._index = ensureElement<HTMLElement>('.basket__item-index', this.container);
-		this.cardPrice = ensureElement<HTMLElement>('.card__price', this.container);
 		this._deleteButton = ensureElement<HTMLButtonElement>('.basket__item-delete', this.container);
-
 		this._deleteButton.addEventListener('click', () =>
 			this.events.emit('basket:deleteItem', { id: this.id })
 		);
